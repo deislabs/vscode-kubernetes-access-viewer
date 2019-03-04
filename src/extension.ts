@@ -16,9 +16,10 @@ export function activate(context: vscode.ExtensionContext) {
     context.subscriptions.push(...subscriptions);
 }
 
-async function showAccess() {
+async function showAccess(target?: any) {
+    const namespace = targetNamespace(target);
     const access = await longRunning('Rakkess is retrieving access info...', () =>
-        rakkess.access(shell)
+        rakkess.access(shell, namespace)
     );
     if (failed(access)) {
         await vscode.window.showErrorMessage(access.error[0]);
@@ -31,4 +32,24 @@ async function showAccess() {
 function showAccessView(access: Access): void {
     const json = JSON.stringify(access, undefined, 2);
     console.log(json);
+}
+
+function targetNamespace(commandTarget: any): string | undefined {
+    if (!commandTarget) {
+        return undefined;
+    }
+    if (isKubernetesObject(commandTarget)) {
+        return commandTarget.id;
+    }
+    return undefined;
+}
+
+// TODO: replace with SDK
+function isKubernetesObject(obj: any): obj is KubernetesObject {
+    return obj.id;
+}
+
+interface KubernetesObject {
+    readonly id: string;
+    readonly metadata?: any;
 }

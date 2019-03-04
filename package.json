@@ -43,6 +43,11 @@
                     "command": "k8saccessviewer.showAccess",
                     "when": "view == extension.vsKubernetesExplorer && viewItem =~ /^vsKubernetes\\.\\w*cluster$/i",
                     "group": "8"
+                },
+                {
+                    "command": "k8saccessviewer.showAccess",
+                    "when": "view == extension.vsKubernetesExplorer && viewItem =~ /^vsKubernetes\\.resource\\.namespace(\\.inactive)?$/i",
+                    "group": "8"
                 }
             ]
         }

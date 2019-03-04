@@ -26,6 +26,7 @@ function andLog<T>(fn: (s: string) => T): (s: string) => T {
     };
 }
 
-export function access(sh: shell.Shell): Promise<Errorable<Access>> {
-    return invokeObj(sh, '--verbs get,list,watch,create,update,delete,proxy --output ascii-table', {}, parseRakkessOutput);
+export function access(sh: shell.Shell, namespace: string | undefined): Promise<Errorable<Access>> {
+    const nsarg = namespace ? `--namespace ${namespace}` : '';
+    return invokeObj(sh, `${nsarg} --verbs get,list,watch,create,update,delete,proxy --output ascii-table`, {}, parseRakkessOutput);
 }
