@@ -1,6 +1,7 @@
 'use strict';
 
 import * as vscode from 'vscode';
+import * as k8s from 'vscode-kubernetes-tools-api';
 
 import * as rakkess from './rakkess/rakkess';
 import { shell } from './utils/shell';
@@ -8,7 +9,16 @@ import { failed } from './utils/errorable';
 import { Access } from './rakkess/rakkess.apimodel';
 import { longRunning } from './utils/host';
 
-export function activate(context: vscode.ExtensionContext) {
+let commandTargetResolver: k8s.CommandTargetsV1 | undefined = undefined;
+
+export async function activate(context: vscode.ExtensionContext) {
+    const commandTargets = await k8s.extension.commandTargets.v1;
+    if (commandTargets.available) {
+        commandTargetResolver = commandTargets.api;
+    } else {
+        vscode.window.showErrorMessage("Unable to access Kubernetes extension");  // TODO: better error message
+    }
+
     const subscriptions = [
         vscode.commands.registerCommand('k8saccessviewer.showAccess', showAccess)
     ];
@@ -38,18 +48,15 @@ function targetNamespace(commandTarget: any): string | undefined {
     if (!commandTarget) {
         return undefined;
     }
-    if (isKubernetesObject(commandTarget)) {
-        return commandTarget.id;
+    if (!commandTargetResolver) {
+        return undefined;
     }
+
+    const target = commandTargetResolver.resolve(commandTarget);
+    if (target && target.targetType === 'kubernetes-explorer-node') {
+        // TODO: this needs to check if it is actually a namespace object
+        return target.id;
+    }
+
     return undefined;
-}
-
-// TODO: replace with SDK
-function isKubernetesObject(obj: any): obj is KubernetesObject {
-    return obj.id;
-}
-
-interface KubernetesObject {
-    readonly id: string;
-    readonly metadata?: any;
 }
