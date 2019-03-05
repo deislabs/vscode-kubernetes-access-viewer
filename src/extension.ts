@@ -54,8 +54,13 @@ function targetNamespace(commandTarget: any): string | undefined {
 
     const target = commandTargetResolver.resolve(commandTarget);
     if (target && target.targetType === 'kubernetes-explorer-node') {
-        // TODO: this needs to check if it is actually a namespace object
-        return target.id;
+        const node = target.node;
+        if (node.nodeType === 'resource' && node.resourceKind.manifestKind === 'Namespace') {
+            // Technically we don't need to check the resource kind as we never display
+            // the menu item for any other kind of resource. But this shows an example of
+            // how to do it!
+            return node.name;
+        }
     }
 
     return undefined;
