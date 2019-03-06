@@ -11,18 +11,37 @@ const CLUSTER_AUTHORITY = 'cluster';
 const NAMESPACE_AUTHORITY = 'namespace';
 
 export function clusterUri(): vscode.Uri {
-    return vscode.Uri.parse(`${ACCESS_SCHEME}://${CLUSTER_AUTHORITY}/`);
+    return vscode.Uri.parse(`${ACCESS_SCHEME}://${CLUSTER_AUTHORITY}/?${nonce()}`);
 }
 
 export function namespaceUri(namespace: string): vscode.Uri {
-    return vscode.Uri.parse(`${ACCESS_SCHEME}://${NAMESPACE_AUTHORITY}/${namespace}`);
+    return vscode.Uri.parse(`${ACCESS_SCHEME}://${NAMESPACE_AUTHORITY}/${namespace}?${nonce()}`);
 }
 
+const DOCUMENT_MAP: { [key: string]: string } = {};
+
 export class AccessDocumentProvider implements vscode.TextDocumentContentProvider {
-    onDidChange?: vscode.Event<vscode.Uri> | undefined;
-    provideTextDocumentContent(uri: vscode.Uri, _token: vscode.CancellationToken): vscode.ProviderResult<string> {
-        return provideTextDocumentContent(uri);
+    private onDidChangeEmitter = new vscode.EventEmitter<vscode.Uri>();
+
+    get onDidChange(): vscode.Event<vscode.Uri> {
+        return this.onDidChangeEmitter.event;
     }
+
+    provideTextDocumentContent(uri: vscode.Uri, _token: vscode.CancellationToken): vscode.ProviderResult<string> {
+        const data = DOCUMENT_MAP[uri.query];
+        if (data) {
+            delete DOCUMENT_MAP[uri.query];
+            return data;
+        }
+        backgroundLoadDocumentContent(uri, this.onDidChangeEmitter);
+        return "## Loading...";
+    }
+}
+
+async function backgroundLoadDocumentContent(uri: vscode.Uri, eventEmitter: vscode.EventEmitter<vscode.Uri>): Promise<void> {
+    const content = await provideTextDocumentContent(uri);
+    DOCUMENT_MAP[uri.query] = content;
+    eventEmitter.fire(uri);
 }
 
 async function provideTextDocumentContent(uri: vscode.Uri): Promise<string> {
@@ -63,4 +82,8 @@ function permissionText(p: KindPermission): string {
         case KindPermission.NotApplicable: return "<span style='color: silver'>_n/a_</span>";
         case KindPermission.Error: return "**error**";
     }
+}
+
+function nonce(): string {
+    return Math.random().toString().replace('.', 'x');  // it doesn't need to be cryptographically random dash it all
 }
