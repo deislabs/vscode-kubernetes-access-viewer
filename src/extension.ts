@@ -18,7 +18,8 @@ export async function activate(context: vscode.ExtensionContext) {
 
     const subscriptions = [
         vscode.commands.registerCommand('k8saccessviewer.showAccess', showAccess),
-        vscode.workspace.registerTextDocumentContentProvider('rakkess', new AccessDocumentProvider()),
+        vscode.commands.registerCommand('k8saccessviewer.whoCan', whoCan),
+        vscode.workspace.registerTextDocumentContentProvider('rakkess', new AccessDocumentProvider())
     ];
 
     context.subscriptions.push(...subscriptions);
@@ -49,4 +50,8 @@ function targetNamespace(commandTarget: any): string | undefined {
     }
 
     return undefined;
+}
+
+function whoCan() {
+    // TBA
 }
