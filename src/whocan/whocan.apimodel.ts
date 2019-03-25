@@ -38,7 +38,7 @@ function parseBindingsTranche<T>(lines: string[], lineParser: (l: string) => T):
 }
 
 function parseRoleBinding(line: string): RoleBinding {
-    const bits = line.split('\t');
+    const bits = line.split(/\s+/);
     return {
         roleBinding: bits[0],
         roleBindingNamespace: bits[1],
@@ -49,7 +49,7 @@ function parseRoleBinding(line: string): RoleBinding {
 }
 
 function parseClusterRoleBinding(line: string): ClusterRoleBinding {
-    const bits = line.split('\t');
+    const bits = line.split(/\s+/);
     return {
         clusterRoleBinding: bits[0],
         subject: bits[1],

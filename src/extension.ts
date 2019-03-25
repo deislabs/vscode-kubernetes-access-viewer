@@ -3,8 +3,10 @@
 import * as vscode from 'vscode';
 import * as k8s from 'vscode-kubernetes-tools-api';
 
-import { AccessDocumentProvider } from './access-document-provider';
+import { AccessDocumentProvider, ACCESS_SCHEME } from './access-document-provider';
 import * as accessDocumentProvider from './access-document-provider';
+import { WhoCanDocumentProvider, WHOCAN_SCHEME } from './who-can-document-provider';
+import * as whoCanDocumentProvider from './who-can-document-provider';
 
 let clusterExplorer: k8s.ClusterExplorerV1 | undefined = undefined;
 
@@ -19,7 +21,8 @@ export async function activate(context: vscode.ExtensionContext) {
     const subscriptions = [
         vscode.commands.registerCommand('k8saccessviewer.showAccess', showAccess),
         vscode.commands.registerCommand('k8saccessviewer.whoCan', whoCan),
-        vscode.workspace.registerTextDocumentContentProvider('rakkess', new AccessDocumentProvider())
+        vscode.workspace.registerTextDocumentContentProvider(ACCESS_SCHEME, new AccessDocumentProvider()),
+        vscode.workspace.registerTextDocumentContentProvider(WHOCAN_SCHEME, new WhoCanDocumentProvider())
     ];
 
     context.subscriptions.push(...subscriptions);
@@ -52,6 +55,34 @@ function targetNamespace(commandTarget: any): string | undefined {
     return undefined;
 }
 
-function whoCan() {
-    // TBA
+async function whoCan(target?: any): Promise<void> {
+    const targetNode = resolveWhoCanTarget(target);
+    if (!targetNode) {
+        // TODO: prompt
+        vscode.window.showWarningMessage("Who Can does not yet implement prompting for target");
+        return;
+    }
+    const resource = resourceID(targetNode);
+    // TODO: verb me
+    const uri = whoCanDocumentProvider.uri('get', resource);
+    await vscode.commands.executeCommand("markdown.showPreview", uri);
+}
+
+function resolveWhoCanTarget(target?: any): k8s.ClusterExplorerV1.ClusterExplorerResourceFolderNode | k8s.ClusterExplorerV1.ClusterExplorerResourceNode | undefined {
+    if (!clusterExplorer) {
+        return undefined;
+    }
+
+    const node = clusterExplorer.resolveCommandTarget(target);
+    if (node && (node.nodeType === 'folder.resource' || node.nodeType === 'resource')) {
+        return node;
+    }
+    return undefined;
+}
+
+function resourceID(node: k8s.ClusterExplorerV1.ClusterExplorerResourceFolderNode | k8s.ClusterExplorerV1.ClusterExplorerResourceNode): string {
+    if (node.nodeType === 'folder.resource') {
+        return node.resourceKind.abbreviation;
+    }
+    return `${node.resourceKind.abbreviation}/${node.name}`;
 }
