@@ -61,7 +61,7 @@
     },
     "dependencies": {
         "shelljs": "^0.7.7",
-        "vscode-kubernetes-tools-api": "file:../vscode-kubernetes-tools-api/vscode-kubernetes-tools-api-0.0.1.tgz"
+        "vscode-kubernetes-tools-api": "^0.0.2"
     },
     "devDependencies": {
         "typescript": "^2.6.1",

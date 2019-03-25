@@ -6,12 +6,12 @@ import * as k8s from 'vscode-kubernetes-tools-api';
 import { AccessDocumentProvider } from './access-document-provider';
 import * as accessDocumentProvider from './access-document-provider';
 
-let commandTargetResolver: k8s.CommandTargetsV1 | undefined = undefined;
+let clusterExplorer: k8s.ClusterExplorerV1 | undefined = undefined;
 
 export async function activate(context: vscode.ExtensionContext) {
-    const commandTargets = await k8s.extension.commandTargets.v1;
-    if (commandTargets.available) {
-        commandTargetResolver = commandTargets.api;
+    const clusterExplorerAPI = await k8s.extension.clusterExplorer.v1;
+    if (clusterExplorerAPI.available) {
+        clusterExplorer = clusterExplorerAPI.api;
     } else {
         vscode.window.showErrorMessage("Unable to access Kubernetes extension");  // TODO: better error message
     }
@@ -34,13 +34,12 @@ function targetNamespace(commandTarget: any): string | undefined {
     if (!commandTarget) {
         return undefined;
     }
-    if (!commandTargetResolver) {
+    if (!clusterExplorer) {
         return undefined;
     }
 
-    const target = commandTargetResolver.resolve(commandTarget);
-    if (target && target.targetType === 'kubernetes-explorer-node') {
-        const node = target.node;
+    const node = clusterExplorer.resolveCommandTarget(commandTarget);
+    if (node) {
         if (node.nodeType === 'resource' && node.resourceKind.manifestKind === 'Namespace') {
             // Technically we don't need to check the resource kind as we never display
             // the menu item for any other kind of resource. But this shows an example of
