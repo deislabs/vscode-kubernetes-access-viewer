@@ -26,6 +26,10 @@
                         "rakkess-path": {
                             "type": "string",
                             "description": "File path to a rakkess binary"
+                        },
+                        "kubectl-who-can-path": {
+                            "type": "string",
+                            "description": "File path to a kubectl-who-can binary"
                         }
                     }
                 }

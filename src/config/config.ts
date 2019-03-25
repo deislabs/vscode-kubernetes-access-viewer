@@ -10,6 +10,10 @@ export function rakkessPath(): string | undefined {
     return toolPath('rakkess');
 }
 
+export function whocanPath(): string | undefined {
+    return toolPath('kubectl-who-can');
+}
+
 export function toolPath(tool: string): string | undefined {
     return vscode.workspace.getConfiguration(EXTENSION_CONFIG_KEY)[`${tool}-path`];
 }
