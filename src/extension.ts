@@ -73,7 +73,7 @@ async function whoCan(target?: any): Promise<void> {
         return;
     }
 
-    const verb = await vscode.window.showQuickPick(WHOCAN_VERBS, { placeHolder: 'Action which you want to see who can do, e.g. get' });
+    const verb = await vscode.window.showQuickPick(WHOCAN_VERBS, { placeHolder: 'Action to check who can do, e.g. get' });
     if (!verb) {
         return;
     }
