@@ -54,31 +54,22 @@ async function provideTextDocumentContent(uri: vscode.Uri): Promise<string> {
 }
 
 function formatMarkdown(whoCanInfo: WhoCanInfo, verb: string, resource: string): string {
-    // TODO: less inelegant
     if (whoCanInfo.roleBindings.length === 0 && whoCanInfo.clusterRoleBindings.length === 0) {
         return `**No subjects have permissions to ${verb} ${resource} though either role or cluster role bindings**`;
     }
-    if (whoCanInfo.roleBindings.length === 0) {
-        return `${formatClusterRoleBindingMarkdown(whoCanInfo.clusterRoleBindings)}\n---\n_No subjects have permissions to ${verb} ${resource} through role bindings_`;
-    }
-    if (whoCanInfo.clusterRoleBindings.length === 0) {
-        return `${formatRoleBindingMarkdown(whoCanInfo.roleBindings)}\n---\n_No subjects have permissions to ${verb} ${resource} through cluster role bindings_`;
-    }
-    return `${formatRoleBindingMarkdown(whoCanInfo.roleBindings)}\n---\n${formatClusterRoleBindingMarkdown(whoCanInfo.clusterRoleBindings)}`;
+    const header = [`## Subjects with permission to ${verb} ${resource}`, '| Type | Who | How |', '|---|---|---|'];
+    const rbRows = formatRoleBindingMarkdown(whoCanInfo.roleBindings);
+    const crbRows = formatClusterRoleBindingMarkdown(whoCanInfo.clusterRoleBindings);
+    const rows = rbRows.concat(crbRows).sort();
+    return header.concat(rows).join('\n');
 }
 
-function formatRoleBindingMarkdown(bindings: ReadonlyArray<RoleBinding>): string {
-    const header = ['## Role Bindings', '| Binding | Subject | Subject Type |', '|---|---|---|'];
-    const body = bindings.map((b) => `| ${nsPrefix(b.roleBindingNamespace)}${b.roleBinding} | ${nsPrefix(b.subjectNamespace)}${b.subject} | ${b.subjectType} |`);
-    const rows = header.concat(...body);
-    return rows.join('\n');
+function formatRoleBindingMarkdown(bindings: ReadonlyArray<RoleBinding>): string[] {
+    return bindings.map((b) => `| ${b.subjectType} | ${nsPrefix(b.subjectNamespace)}${b.subject} | RoleBinding ${nsPrefix(b.roleBindingNamespace)}${b.roleBinding} |`);
 }
 
-function formatClusterRoleBindingMarkdown(bindings: ReadonlyArray<ClusterRoleBinding>): string {
-    const header = ['## Cluster Role Bindings', '| Binding | Subject | Subject Type |', '|---|---|---|'];
-    const body = bindings.map((b) => `| ${b.clusterRoleBinding} | ${nsPrefix(b.subjectNamespace)}${b.subject} | ${b.subjectType} |`);
-    const rows = header.concat(...body);
-    return rows.join('\n');
+function formatClusterRoleBindingMarkdown(bindings: ReadonlyArray<ClusterRoleBinding>): string[] {
+    return bindings.map((b) => `| ${b.subjectType} | ${nsPrefix(b.subjectNamespace)}${b.subject} | ClusterRoleBinding ${b.clusterRoleBinding} |`);
 }
 
 function nonce(): string {
