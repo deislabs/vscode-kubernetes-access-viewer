@@ -55,6 +55,16 @@ function targetNamespace(commandTarget: any): string | undefined {
     return undefined;
 }
 
+const WHOCAN_VERBS = [
+    'get',
+    'list',
+    'watch',
+    'create',
+    'update',
+    'patch',
+    'delete'
+];
+
 async function whoCan(target?: any): Promise<void> {
     const targetNode = resolveWhoCanTarget(target);
     if (!targetNode) {
@@ -62,9 +72,14 @@ async function whoCan(target?: any): Promise<void> {
         vscode.window.showWarningMessage("Who Can does not yet implement prompting for target");
         return;
     }
+
+    const verb = await vscode.window.showQuickPick(WHOCAN_VERBS, { placeHolder: 'Action which you want to see who can do, e.g. get' });
+    if (!verb) {
+        return;
+    }
+
     const resource = resourceID(targetNode);
-    // TODO: verb me
-    const uri = whoCanDocumentProvider.uri('get', resource);
+    const uri = whoCanDocumentProvider.uri(verb, resource);
     await vscode.commands.executeCommand("markdown.showPreview", uri);
 }
 
