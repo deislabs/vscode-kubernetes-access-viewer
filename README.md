@@ -2,6 +2,15 @@
 
 This extension helps you to visualise the permissions you have in a Kubernetes cluster.
 
+## Dependencies
+
+This extension depends on:
+
+* `rakkess` by @corneliusweig (https://github.com/corneliusweig/rakkess) - powers
+  the Show Access command
+
+Thanks to the authors and contributors!
+
 ## Contributing
 
 This project welcomes contributions and suggestions.  Most contributions require you to agree to a

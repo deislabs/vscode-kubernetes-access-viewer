@@ -15,13 +15,42 @@
     ],
     "main": "./out/extension",
     "contributes": {
+        "configuration": {
+            "title": "Kubernetes Access Viewer",
+            "properties": {
+                "vscode-k8saccessviewer": {
+                    "type": "object",
+                    "description": "Kubernetes access viewer configuration",
+                    "properties": {
+                        "rakkess-path": {
+                            "type": "string",
+                            "description": "File path to a rakkess binary"
+                        }
+                    }
+                }
+            }
+        },
         "commands": [
             {
                 "command": "k8saccessviewer.showAccess",
                 "title": "Show Access",
                 "category": "Kubernetes"
             }
-        ]
+        ],
+        "menus": {
+            "view/item/context": [
+                {
+                    "command": "k8saccessviewer.showAccess",
+                    "when": "view == extension.vsKubernetesExplorer && viewItem =~ /^vsKubernetes\\.\\w*cluster$/i",
+                    "group": "8"
+                },
+                {
+                    "command": "k8saccessviewer.showAccess",
+                    "when": "view == extension.vsKubernetesExplorer && viewItem =~ /^vsKubernetes\\.resource\\.namespace(\\.inactive)?$/i",
+                    "group": "8"
+                }
+            ]
+        }
     },
     "scripts": {
         "vscode:prepublish": "npm run compile",
@@ -30,12 +59,17 @@
         "postinstall": "node ./node_modules/vscode/bin/install",
         "test": "npm run compile && node ./node_modules/vscode/bin/test"
     },
+    "dependencies": {
+        "shelljs": "^0.7.7",
+        "vscode-kubernetes-tools-api": "^0.0.2"
+    },
     "devDependencies": {
         "typescript": "^2.6.1",
         "vscode": "^1.1.6",
         "tslint": "^5.8.0",
         "@types/node": "^7.0.43",
-        "@types/mocha": "^2.2.42"
+        "@types/mocha": "^2.2.42",
+        "@types/shelljs": "^0.8.0"
     },
     "extensionDependencies": [
         "ms-kubernetes-tools.vscode-kubernetes-tools"
