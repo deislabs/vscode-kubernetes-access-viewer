@@ -6,7 +6,7 @@ import { shell } from './utils/shell';
 import { KindPermission, KindPermissions, Access } from './rakkess/rakkess.apimodel';
 import { failed } from './utils/errorable';
 
-const ACCESS_SCHEME = 'rakkess';
+export const ACCESS_SCHEME = 'rakkess';
 const CLUSTER_AUTHORITY = 'cluster';
 const NAMESPACE_AUTHORITY = 'namespace';
 

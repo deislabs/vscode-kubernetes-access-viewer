@@ -11,7 +11,8 @@
         "Other"
     ],
     "activationEvents": [
-        "onCommand:k8saccessviewer.showAccess"
+        "onCommand:k8saccessviewer.showAccess",
+        "onCommand:k8saccessviewer.whoCan"
     ],
     "main": "./out/extension",
     "contributes": {
@@ -25,6 +26,10 @@
                         "rakkess-path": {
                             "type": "string",
                             "description": "File path to a rakkess binary"
+                        },
+                        "kubectl-who-can-path": {
+                            "type": "string",
+                            "description": "File path to a kubectl-who-can binary"
                         }
                     }
                 }
@@ -34,6 +39,11 @@
             {
                 "command": "k8saccessviewer.showAccess",
                 "title": "Show Access",
+                "category": "Kubernetes"
+            },
+            {
+                "command": "k8saccessviewer.whoCan",
+                "title": "Show Who Can...",
                 "category": "Kubernetes"
             }
         ],
@@ -48,6 +58,14 @@
                     "command": "k8saccessviewer.showAccess",
                     "when": "view == extension.vsKubernetesExplorer && viewItem =~ /^vsKubernetes\\.resource\\.namespace(\\.inactive)?$/i",
                     "group": "8"
+                },
+                {
+                    "command": "k8saccessviewer.whoCan",
+                    "when": "view == extension.vsKubernetesExplorer && viewItem =~ /vsKubernetes\\.kind/i"
+                },
+                {
+                    "command": "k8saccessviewer.whoCan",
+                    "when": "view == extension.vsKubernetesExplorer && viewItem =~ /vsKubernetes\\.resource\\.\\w+/i"
                 }
             ]
         }
@@ -61,7 +79,7 @@
     },
     "dependencies": {
         "shelljs": "^0.7.7",
-        "vscode-kubernetes-tools-api": "^0.0.2"
+        "vscode-kubernetes-tools-api": "^0.0.7"
     },
     "devDependencies": {
         "typescript": "^2.6.1",

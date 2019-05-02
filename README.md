@@ -8,6 +8,8 @@ This extension depends on:
 
 * `rakkess` by @corneliusweig (https://github.com/corneliusweig/rakkess) - powers
   the Show Access command
+* `kubectl-who-can` by @lizrice (https://github.com/aquasecurity/kubectl-who-can) - powers
+  the Show Who Can... command
 
 Thanks to the authors and contributors!
 
