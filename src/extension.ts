@@ -18,6 +18,8 @@ export async function activate(context: vscode.ExtensionContext) {
         vscode.window.showErrorMessage("Unable to access Kubernetes extension");  // TODO: better error message
     }
 
+    customiseClusterExplorer();
+
     const subscriptions = [
         vscode.commands.registerCommand('k8saccessviewer.showAccess', showAccess),
         vscode.commands.registerCommand('k8saccessviewer.whoCan', whoCan),
@@ -26,6 +28,21 @@ export async function activate(context: vscode.ExtensionContext) {
     ];
 
     context.subscriptions.push(...subscriptions);
+}
+
+function customiseClusterExplorer() {
+    if (clusterExplorer) {
+        clusterExplorer.registerNodeContributor(
+            clusterExplorer.nodeSources.groupingFolder(
+                "Security",
+                undefined,
+                clusterExplorer.nodeSources.resourceFolder("Role", "Roles", "Role", "roles"),
+                clusterExplorer.nodeSources.resourceFolder("Cluster Role", "Cluster Roles", "ClusterRole", "clusterroles"),
+                clusterExplorer.nodeSources.resourceFolder("Role Binding", "Role Bindings", "RoleBinding", "rolebindings"),
+                clusterExplorer.nodeSources.resourceFolder("Cluster Role Binding", "Cluster Role Bindings", "ClusterRoleBinding", "clusterrolebindings")
+            ).at(undefined)
+        );
+    }
 }
 
 async function showAccess(target?: any) {

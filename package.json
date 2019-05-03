@@ -12,7 +12,8 @@
     ],
     "activationEvents": [
         "onCommand:k8saccessviewer.showAccess",
-        "onCommand:k8saccessviewer.whoCan"
+        "onCommand:k8saccessviewer.whoCan",
+        "onView:extension.vsKubernetesExplorer"
     ],
     "main": "./out/extension",
     "contributes": {
