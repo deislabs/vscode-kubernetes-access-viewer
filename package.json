@@ -79,7 +79,7 @@
     },
     "dependencies": {
         "shelljs": "^0.7.7",
-        "vscode-kubernetes-tools-api": "^0.0.7"
+        "vscode-kubernetes-tools-api": "^1.0.0"
     },
     "devDependencies": {
         "typescript": "^2.6.1",
